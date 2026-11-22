@@ -1,1 +1,11 @@
 ## no se qu eponer
+# Python
+venv/
+__pycache__/
+*.pyc
+.env
+
+# Angular / Node
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
