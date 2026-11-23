@@ -1,0 +1,99 @@
+<main style="max-width: 950px; margin: 2rem auto; font-family: sans-serif; padding: 0 1rem;">
+  <h1>Panel de Operador - Estacionamiento</h1>
+
+  <!-- Estado del Semáforo y Alerta en Tiempo Real -->
+  <section style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding: 1rem; border: 1px solid #ccc; border-radius: 8px;">
+    <div style="display: flex; gap: 0.5rem;">
+      <span [style.opacity]="estado.semaforo === 'ROJO' ? 1 : 0.2" style="width: 24px; height: 24px; border-radius: 50%; background: #dc2626; display: inline-block;"></span>
+      <span [style.opacity]="estado.semaforo === 'AMARILLO' ? 1 : 0.2" style="width: 24px; height: 24px; border-radius: 50%; background: #eab308; display: inline-block;"></span>
+      <span [style.opacity]="estado.semaforo === 'VERDE' ? 1 : 0.2" style="width: 24px; height: 24px; border-radius: 50%; background: #16a34a; display: inline-block;"></span>
+    </div>
+    <div>
+      <strong>Semáforo: {{ estado.semaforo }}</strong> — {{ estado.alerta }}
+    </div>
+  </section>
+
+  @if (mensajeEstado) {
+    <p style="padding: 0.75rem; background: #e0f2fe; color: #0369a1; border-radius: 6px;">{{ mensajeEstado }}</p>
+  }
+
+  <!-- Control de Actuadores -->
+  <section style="margin-bottom: 1.5rem; padding: 1rem; border: 1px solid #ccc; border-radius: 8px;">
+    <h2>Control Manual de Accesos</h2>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+      <button (click)="accionPluma('abrir')">Abrir Pluma Vehicular</button>
+      <button (click)="accionPluma('cerrar')">Cerrar Pluma Vehicular</button>
+      <button (click)="accionPuerta('abrir')">Abrir Puerta Peatonal</button>
+      <button (click)="accionPuerta('cerrar')">Cerrar Puerta Peatonal</button>
+    </div>
+  </section>
+
+  <!-- Registro de Usuario + Llavero + Tarjeta -->
+  <section style="margin-bottom: 1.5rem; padding: 1rem; border: 1px solid #ccc; border-radius: 8px;">
+    <h2>Registrar Usuario y Credenciales RFID</h2>
+    <form (ngSubmit)="registrarUsuario()" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <input type="text" [(ngModel)]="nuevoPropietario" name="prop" placeholder="Propietario" required>
+      <input type="text" [(ngModel)]="nuevoLlavero" name="llav" placeholder="UID Llavero (Peatón)" required>
+      <input type="text" [(ngModel)]="nuevaTarjeta" name="tarj" placeholder="UID Tarjeta (Vehículo)" required>
+      <button type="submit">Registrar</button>
+    </form>
+  </section>
+
+  <!-- Estado Actual de Usuarios y Vehículos -->
+  <section style="margin-bottom: 1.5rem;">
+    <h2>Usuarios y Vehículos Registrados</h2>
+    <table border="1" cellpadding="8" style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th>Propietario</th>
+          <th>UID Llavero</th>
+          <th>UID Tarjeta</th>
+          <th>Peatón</th>
+          <th>Vehículo</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (u of usuarios; track u.id) {
+          <tr>
+            <td>{{ u.propietario }}</td>
+            <td>{{ u.uid_llavero }}</td>
+            <td>{{ u.uid_tarjeta }}</td>
+            <td>{{ u.usuario_adentro ? 'Adentro' : 'Afuera' }}</td>
+            <td>{{ u.vehiculo_adentro ? 'Guardado' : 'Afuera' }}</td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5">No hay usuarios registrados.</td></tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Historial de Eventos -->
+  <section>
+    <h2>Historial de Eventos</h2>
+    <table border="1" cellpadding="8" style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Propietario</th>
+          <th>Credencial</th>
+          <th>Acción</th>
+          <th>Detalle</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (ev of eventos; track ev.id) {
+          <tr>
+            <td>{{ ev.fecha | date:'short' }}</td>
+            <td>{{ ev.propietario }}</td>
+            <td>{{ ev.tipo_credencial }}</td>
+            <td>{{ ev.accion }}</td>
+            <td>{{ ev.detalle }}</td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5">Sin eventos registrados.</td></tr>
+        }
+      </tbody>
+    </table>
+  </section>
+</main>
