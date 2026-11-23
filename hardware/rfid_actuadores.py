@@ -7,6 +7,7 @@ PIN_PUERTA = 13
 PIN_ROJO = 17
 PIN_AMARILLO = 27
 PIN_VERDE = 22
+PIN_BUZZER = 23
 
 # Duty cycles típicos para SG90 (ajusta si tu maqueta requiere otro ángulo)
 ANGULO_CERRADO = 2.5   # ~0°
@@ -16,6 +17,8 @@ class Actuadores:
     def __init__(self):
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
+        GPIO.setup(PIN_BUZZER, GPIO.OUT)
+        GPIO.output(PIN_BUZZER, GPIO.LOW)
 
         # LEDs
         for pin in (PIN_ROJO, PIN_AMARILLO, PIN_VERDE):
@@ -66,3 +69,8 @@ class Actuadores:
         self.pwm_pluma.stop()
         self.pwm_puerta.stop()
         GPIO.cleanup()
+    
+    def beep(self, duracion=0.12):
+        GPIO.output(PIN_BUZZER, GPIO.HIGH)
+        time.sleep(duracion)
+        GPIO.output(PIN_BUZZER, GPIO.LOW)

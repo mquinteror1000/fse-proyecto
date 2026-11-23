@@ -17,6 +17,7 @@ class LectorRFID:
         return f"{uid_int:X}".upper()
 
     def procesar_uid(self, uid):
+        self.actuadores.beep()
         print(f"[RFID] Detectado UID: {uid}")
         conn = get_db_connection()
         cur = conn.cursor()
