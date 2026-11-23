@@ -1,5 +1,12 @@
 from flask import Flask, jsonify, request
 from db import get_db_connection
+import paho.mqtt.publish as publish
+
+def enviar_mqtt(topic, mensaje):
+    try:
+        publish.single(topic, payload=mensaje, hostname="127.0.0.1", port=1883)
+    except Exception as e:
+        print(f"Error MQTT: {e}")
 
 app = Flask(__name__)
 
@@ -84,12 +91,18 @@ def controlar_pluma():
 
     if accion == "abrir":
         # TODO MQTT: publicar "abrir" en "estacionamiento/pluma" y "VERDE" en "estacionamiento/semaforo"
+        ## agregado en etapa de hardware
+        enviar_mqtt("estacionamiento/pluma", "abrir")
+        enviar_mqtt("estacionamiento/semaforo", "VERDE")
         cur.execute(
             "UPDATE estado_sistema SET semaforo = 'VERDE', alerta = 'Pluma abierta: vehículo en paso' WHERE id = 1;"
         )
     else:
         # TODO MQTT: publicar "cerrar" en "estacionamiento/pluma" y "ROJO" en "estacionamiento/semaforo"
         # Si había un vehículo en tránsito, actualizamos su estado en BD
+        ## agregado en etapa de hardware
+        enviar_mqtt("estacionamiento/pluma", "cerrar")
+        enviar_mqtt("estacionamiento/semaforo", "ROJO")
         if est["registro_pendiente_id"] and est["tipo_operacion"]:
             if est["tipo_operacion"] == "SALIDA":
                 cur.execute(
@@ -126,7 +139,7 @@ def controlar_puerta():
         return jsonify({"error": "Acción inválida"}), 400
 
     # TODO MQTT: publicar accion en "estacionamiento/puerta"
-    print(f"[ACTUADOR] Puerta peatonal -> {accion}")
+    enviar_mqtt("estacionamiento/puerta", accion)
     return jsonify({"status": "ok", "actuador": "puerta", "accion": accion})
 
 if __name__ == "__main__":
